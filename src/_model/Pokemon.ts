@@ -1,7 +1,7 @@
 import {Type} from "./Type";
 
 export interface Pokemon {
-  image: string;
+  images: [];
   number: number;
   name: string;
   types: Type[];

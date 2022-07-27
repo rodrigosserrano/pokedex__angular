@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {from, map, mergeMap} from "rxjs";
+import {from, map, mergeMap, ReplaySubject} from "rxjs";
 import {Pokemon} from "../_model/Pokemon";
 
 @Injectable({
@@ -17,9 +17,30 @@ export class PokemonService {
   public pokemons: Pokemon[] = [];
 
   constructor(private httpClient: HttpClient) {
+    // this.requestPokedex()
+    this.requestNestJs()
+  }
+
+  private requestNestJs(){
+    const apiUrl = 'http://localhost:3000/pokemon/';
+
+    this.httpClient.get<any>(apiUrl).subscribe((res:any) => {
+      res.map((r:any) => {
+        this.pokemons[r.id] = {
+          images: r.images[0].url,
+          number: r.id,
+          name: r.name,
+          types: r.types.map((t: any) => t.type.name),
+        };
+      });
+    });
+  }
+
+  /*
+  private requestPokedex(){
     const allPokemonsUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=100';
 
-    /*
+    /******************************
     //A primeira request trás o {algo..., result: { {name: 'xx', url: 'xxx'}, {name: 'xx', url: 'xxx'} }
     this.httpClient.get<any>(allPokemonsUrl).pipe(
       //Aqui é percorrido a request para pegarmos o result dela que é o que importa
@@ -28,8 +49,8 @@ export class PokemonService {
           )
         ),
       ).subscribe(this.pokemons);
-     */
-
+     *******************************/
+    /*
     this.httpClient.get<any>(allPokemonsUrl).pipe(
       map(value => value.results),
       map((value: any) => {
@@ -39,6 +60,7 @@ export class PokemonService {
       }),
       mergeMap(value => value),
     ).subscribe((result: any) => {
+      console.log(result);
       this.pokemons[result.id] = {
         image: result.sprites.front_default,
         number: result.id,
@@ -47,4 +69,5 @@ export class PokemonService {
       };
     })
   }
+  */
 }
